@@ -1,0 +1,20 @@
+apiVersion: v1
+data:
+  config.yaml: |-
+    mysql:
+      host: mysql.internal.tmigrate.com
+      port: 3306
+      user: root
+      password: P@ssw0rd
+      dbname: app1
+
+    redis:
+      addr: redis.internal.tmigrate.com:6379
+      password: P@ssw0rd
+      db: 0
+
+    log:
+      filePath: "/tmp/app1.log"
+kind: ConfigMap
+metadata:
+  name: vol-config

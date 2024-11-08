@@ -1,0 +1,4 @@
+select 0
+keys *
+sadd groupset group1 group2 group3
+smembers groupset

@@ -1,0 +1,101 @@
+configmap:
+  data:
+    config.yaml: |
+      mysql:
+        host: mysql.internal.rebirthmonkey.com
+        port: 3306
+        user: root
+        password: P@ssw0rd
+        dbname: app1
+        config: utf8&parseTime=True&loc=Local
+      
+      redis:
+        addr: redis.internal.rebirthmonkey.com:6379
+        password: 7593ba86-c425-48f0-90f1-e22fda57bfc8
+        db: 0
+      
+      log:
+        filePath: "/tmp/app.log"
+      
+      gin:
+        bind-address: 0.0.0.0 # 如需要在 Docker 中运行，需设置为 0.0.0.0 表示使用全部网络接口，默认为 127.0.0.1
+        bind-port: 8888 # 提供非安全认证的监听端口，默认为 8080
+        mode: debug # server mode: release, debug, test，默认 release
+        healthz: true # 是否开启健康检查，如果开启会安装 /healthz 路由，默认 true
+        #    middlewares: recovery,logger,secure,nocache,cors,dump # 加载的 gin 中间件列表，多个中间件，逗号(,)隔开
+        middlewares: recovery,secure,nocache,cors,dump # 加载的 gin 中间件列表，多个中间件，逗号(,)隔开
+
+
+# Secrets (Optional) - Create your secrets for registry
+imageCredentials:
+  secretName: registry-secret
+  registry: registry.rebirthmonkey.com
+  username: ruan
+  password: glpat-pabJq3S_c_VzhYkMHa-a
+
+
+deployment:
+  replicaCount: 1
+
+  image:
+    # Change the image to your own repository's image
+#    repository: registry.rebirthmonkey.com/lab/cloud-product/app1
+#    repository: wukongsun/app1
+    repository: registry.rebirthmonkey.com/ops/ops/app1
+    pullPolicy: Always
+    tag: v1.0.0
+
+#  imagePullSecrets: []
+  imagePullSecrets:
+  # Remove the [] above and uncomment the line below to use your secret defined
+     - name: registry-secret
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+
+service:
+  enabled: false
+#  enabled: true
+#  name: app
+#  type: LoadBalancer
+#  port: 80
+##   When using an ingress on GCP, change to the below config to NodePort
+
+
+# Ingress (Optional) - When deploying with Ingress Controller
+ingress:
+   enabled: false
+#  enabled: true
+#  # annotations:
+#  #   networking.gke.io/managed-certificates: managed-cert
+#  #   kubernetes.io/ingress.class: "gce"
+#  #   networking.gke.io/v1beta1.FrontendConfig: ingress-security-config
+
+
+# Extra manifests (Optional) - Additional manifests for your environment
+# specific configurations
+extraObjects: []
+  # Create Managed Certificate on GCP
+  # - apiVersion: networking.gke.io/v1
+  #   kind: ManagedCertificate
+  #   metadata:
+  #     name: managed-cert
+  #   spec:
+  #     domains:
+  #       - app2.rebirthmonkey.com
+  #
+  # Create Load Balancer FrontendConfig on GCP
+  # - apiVersion: networking.gke.io/v1beta1
+  #   kind: FrontendConfig
+  #   metadata:
+  #     name: ingress-security-config
+  #   spec:
+  #     sslPolicy: gke-ingress-ssl-policy-https
+  #     redirectToHttps:
+  #       enabled: true

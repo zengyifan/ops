@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: app
+  name: app
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      k8s-app: app
+  template:
+    metadata:
+      labels: 
+        k8s-app: app
+    spec:
+      {{- with .Values.deployment.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8}}
+      {{- end }}
+      containers:
+        - image: "{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}"
+          imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
+          name: app
+          ports:
+          - containerPort: 8888
+            name: insecure
+            protocol: TCP
+          resources:
+            {{- toYaml .Values.deployment.resources | nindent 12}}
+          volumeMounts:
+            - mountPath: /etc/app
+              name: vol-config
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+      - configMap:
+          name: vol-config
+        name: vol-config

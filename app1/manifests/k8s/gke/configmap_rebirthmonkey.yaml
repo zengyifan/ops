@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: vol-config
+data:
+  config.yaml: |-
+    mysql:
+      host: mysql.internal.rebirthmonkey.com
+      port: 3306
+      user: root
+      password: P@ssw0rd
+      dbname: app1
+
+    redis:
+      addr: redis.internal.rebirthmonkey.com:6379
+      password: 7593ba86-c425-48f0-90f1-e22fda57bfc8
+      db: 0
+
+    log:
+      filePath: "/tmp/app.log"

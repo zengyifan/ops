@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: app1
+  name: app1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: app1
+  template:
+    metadata:
+      labels:
+        k8s-app: app1
+    spec:
+      imagePullSecrets:
+        - name: gitlab-registry
+      containers:
+        - image: tmigrate.tencentcloudcr.com/tmigrate/app1-amd64:v1.0.0
+          imagePullPolicy: IfNotPresent
+          name: app1
+          ports:
+            - containerPort: 8888
+              name: insecure
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - mountPath: /etc/app1
+              name: vol-config
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            name: vol-config
+          name: vol-config

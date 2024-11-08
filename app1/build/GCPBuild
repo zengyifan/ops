@@ -1,0 +1,20 @@
+# Builder
+FROM golang:1.21 as builder
+
+WORKDIR /app
+# copy the Go Modules manifests
+COPY go.mod go.mod
+COPY go.sum go.sum
+RUN go mod download
+
+# copy source code
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app1 cmd/app1/main.go
+
+# Distribution
+FROM alpine:latest
+WORKDIR /app
+EXPOSE 8888
+
+COPY --from=builder /app/app1 /app/app1
+CMD ["/app/app1"]
